@@ -61,11 +61,14 @@ pub struct EllipticalOrbit {
     pub id: u32,
     pub x: f64,
     pub y: f64,
+    pub focus_x: f64,
+    pub focus_y: f64,
     pub center_x: f64,
     pub center_y: f64,
     pub major_axis: f64,
     pub minor_axis: f64,
     pub angle: f64,
+    pub dir_to_focus: f64,
     pub period: f64,
     pub orbital_offset: f64,
     pub eccentricity: f64,
@@ -95,11 +98,14 @@ impl EllipticalOrbit {
             id,
             x: 0.0,
             y: 0.0,
+            focus_x,
+            focus_y,
             center_x,
             center_y,
             major_axis,
             minor_axis,
             angle,
+            dir_to_focus: 0.0,
             period,
             orbital_offset,
             eccentricity,
@@ -117,11 +123,14 @@ impl EllipticalOrbit {
         offsets.insert("id", offset_of!(Self, id));
         offsets.insert("x", offset_of!(Self, x));
         offsets.insert("y", offset_of!(Self, y));
+        offsets.insert("focus_x", offset_of!(Self, focus_x));
+        offsets.insert("focus_y", offset_of!(Self, focus_y));
         offsets.insert("center_x", offset_of!(Self, center_x));
         offsets.insert("center_y", offset_of!(Self, center_y));
         offsets.insert("major_axis", offset_of!(Self, major_axis));
         offsets.insert("minor_axis", offset_of!(Self, minor_axis));
         offsets.insert("angle", offset_of!(Self, angle));
+        offsets.insert("dir_to_focus", offset_of!(Self, dir_to_focus));
         offsets.insert("period", offset_of!(Self, period));
         offsets.insert("orbital_offset", offset_of!(Self, orbital_offset));
         offsets.insert("eccentricity", offset_of!(Self, eccentricity));
@@ -157,6 +166,8 @@ impl EllipticalOrbit {
     fn update(&mut self, ellapsed: f64) {
         let cur_angle = self.orbital_offset + 2.0 * std::f64::consts::PI * ellapsed / self.period;
         let (x, y) = self.get_xy(cur_angle);
+        // Compute the direction to the focus
+        self.dir_to_focus = (self.focus_y - y).atan2(self.focus_x - x);
         self.x = x;
         self.y = y
     }
